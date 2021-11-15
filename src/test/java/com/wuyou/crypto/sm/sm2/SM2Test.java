@@ -36,7 +36,7 @@ public class SM2Test {
     }
 
     @Test
-    public void testEncryptAndDecrypt() throws Exception {
+    public void testEncryptAndDecrypt() {
         // generate key pair
         KeyPair keyPair = SM2Helper.generateKeyPair();
         if (keyPair == null) {
@@ -79,7 +79,7 @@ public class SM2Test {
     }
 
     @Test
-    public void testSignAndVerify() throws Exception {
+    public void testSignAndVerify() {
         KeyPair keyPair = SM2Helper.generateKeyPair();
         if (keyPair == null) {
             return;

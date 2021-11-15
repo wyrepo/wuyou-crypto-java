@@ -3,7 +3,7 @@ package com.wuyou.crypto.paillier;
 import com.wuyou.crypto.paillier.key.PrivateKey;
 import com.wuyou.crypto.paillier.key.PublicKey;
 import com.wuyou.crypto.paillier.num.Cipher;
-import com.wuyou.crypto.paillier.util.Util;
+import com.wuyou.crypto.paillier.util.PaillierUtil;
 import org.junit.Test;
 
 import java.math.BigInteger;
@@ -27,23 +27,23 @@ public class PaillierTest {
         BigInteger sum = eX.addCipherText(eY).decrypt(privateKey);
 
         // Paillier.Cipher to Hex String (serialize)
-        String eXStr = Util.cipherToHexStr(eX);
+        String eXStr = PaillierUtil.cipherToHexStr(eX);
         if (eXStr == null || eXStr.isEmpty()) {
             return;
         }
         System.out.println("eX HexStr:" + eXStr);
-        String eYStr = Util.cipherToHexStr(eY);
+        String eYStr = PaillierUtil.cipherToHexStr(eY);
         if (eYStr == null || eYStr.isEmpty()) {
             return;
         }
         System.out.println("eY HexStr:" + eYStr);
 
         // Hex string to Paillier.Cipher (deserialize)
-        Cipher eXNum = Util.hexStrToCipher(publicKey, eXStr);
+        Cipher eXNum = PaillierUtil.hexStrToCipher(publicKey, eXStr);
         if (eXNum == null) {
             return;
         }
-        Cipher eYNum = Util.hexStrToCipher(publicKey, eYStr);
+        Cipher eYNum = PaillierUtil.hexStrToCipher(publicKey, eYStr);
         if (eYNum == null) {
             return;
         }
@@ -61,24 +61,24 @@ public class PaillierTest {
         System.out.println("pk.len:" + publicKey.getLen()); // 1024
 
         // serialize public key
-        byte[] bytes = Util.serializePublicKey(publicKey);
+        byte[] bytes = PaillierUtil.serializePublicKey(publicKey);
         if (bytes == null || bytes.length <= 0) {
             return;
         }
         // deserialize public key
-        PublicKey pk = Util.deserializePublicKey(bytes);
+        PublicKey pk = PaillierUtil.deserializePublicKey(bytes);
         if (pk == null) {
             return;
         }
         System.out.println("pk.len:" + pk.getLen()); // 1024
 
         // serialize private key
-        byte[] bytes2 = Util.serializePrivateKey(privateKey);
+        byte[] bytes2 = PaillierUtil.serializePrivateKey(privateKey);
         if (bytes2 == null || bytes2.length <= 0) {
             return;
         }
         // deserialize private key
-        PrivateKey sk = Util.deserializePrivateKey(bytes2);
+        PrivateKey sk = PaillierUtil.deserializePrivateKey(bytes2);
         if (sk == null) {
             return;
         }
@@ -92,7 +92,7 @@ public class PaillierTest {
         System.out.println("pk.len:" + publicKey.getLen()); // 1024
 
         // write public key to pem file
-        String pkPem = Util.writePublicKeyToPem(publicKey);
+        String pkPem = PaillierUtil.writePublicKeyToPem(publicKey);
         if (pkPem == null || pkPem.isEmpty()) {
             return;
         }
@@ -101,14 +101,14 @@ public class PaillierTest {
 
         // read public key from pem file
         pkPem = new String(Files.readAllBytes(Paths.get("publickey.key")), UTF_8);
-        PublicKey pk = Util.readPublicKeyFromPem(pkPem);
+        PublicKey pk = PaillierUtil.readPublicKeyFromPem(pkPem);
         if (pk == null) {
             return;
         }
         System.out.println("pk.len:" + pk.getLen()); // 1024
 
         // write private key to pem file
-        String skPem = Util.writePrivateKeyToPem(privateKey);
+        String skPem = PaillierUtil.writePrivateKeyToPem(privateKey);
         if (skPem == null || skPem.isEmpty()) {
             return;
         }
@@ -117,13 +117,12 @@ public class PaillierTest {
 
         // read private key from pem file
         skPem = new String(Files.readAllBytes(Paths.get("privatekey.key")), UTF_8);
-        PrivateKey sk = Util.readPrivateKeyFromPem(skPem);
+        PrivateKey sk = PaillierUtil.readPrivateKeyFromPem(skPem);
         if (sk == null) {
             return;
         }
         System.out.println("pk.len:" + sk.getPublicKey().getLen()); // 1024
     }
-
 
     @Test
     public void testPaillierOps() throws Exception {

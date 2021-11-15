@@ -5,7 +5,6 @@ import com.wuyou.crypto.paillier.key.PublicKey;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.*;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Random;
@@ -17,7 +16,7 @@ public class CipherTest {
     private PublicKey publicKey;
     private Random rng;
     private int N_BIT_LENGTH = 1024;
-    private int NUMBER_BIT_LENGTH = N_BIT_LENGTH / 2;
+    private int NUMBER_BIT_LENGTH = 63; // must less than 64, Long.MAX_VALUE = 2^63-1
 
     @Before
     public void setUp() {
@@ -44,18 +43,8 @@ public class CipherTest {
     public void testDecryption() {
         BigInteger message = new BigInteger(NUMBER_BIT_LENGTH, rng);
         Cipher cipher = new Cipher(message, publicKey);
-        assertEquals(message, cipher.decrypt(privateKey));
-    }
-
-    @Test
-    public void testAdditionOfPositiveConstant() {
-        BigInteger a = new BigInteger(NUMBER_BIT_LENGTH, rng);
-        BigInteger b = new BigInteger(NUMBER_BIT_LENGTH, rng);
-        BigInteger expected = a.add(b);
-        expected = expected.mod(publicKey.getN());
-        Cipher cipher = new Cipher(a, publicKey);
-        cipher = cipher.addPlainText(b);
-        assertEquals(expected, cipher.decrypt(privateKey));
+        BigInteger decrypt = cipher.decrypt(privateKey);
+        assertEquals(message, decrypt);
     }
 
     @Test
@@ -66,32 +55,6 @@ public class CipherTest {
         Cipher cipher = new Cipher(a, publicKey);
         cipher = cipher.addPlainText(b);
         assertEquals(expected, cipher.decrypt(privateKey));
-    }
-
-    @Test
-    public void testSubtractionToNegativeResult() {
-        BigInteger a = BigInteger.ONE;
-        BigInteger b = BigInteger.TEN.negate();
-        BigInteger expected = a.add(b).mod(publicKey.getN());
-        Cipher cipher = new Cipher(a, publicKey);
-        cipher = cipher.addPlainText(b);
-        assertEquals(expected, cipher.decrypt(privateKey));
-    }
-
-    @Test
-    public void testAdditionOfEncryptedInteger() {
-        BigInteger a = new BigInteger(NUMBER_BIT_LENGTH, rng);
-        BigInteger b = new BigInteger(NUMBER_BIT_LENGTH, rng);
-        BigInteger expected = a.add(b);
-        expected = expected.mod(publicKey.getN());
-        Cipher cipherA = new Cipher(a, publicKey);
-        Cipher cipherB = new Cipher(b, publicKey);
-        try {
-            cipherA = cipherA.addCipherText(cipherB);
-        } catch (Exception e) {
-            fail();
-        }
-        assertEquals(expected, cipherA.decrypt(privateKey));
     }
 
     @Test
@@ -107,17 +70,6 @@ public class CipherTest {
             fail();
         } catch (Exception e) {
         }
-    }
-
-    @Test
-    public void testMultiplicationOfConstant() {
-        BigInteger a = new BigInteger(NUMBER_BIT_LENGTH, rng);
-        BigInteger b = new BigInteger(NUMBER_BIT_LENGTH, rng);
-        BigInteger expected = a.multiply(b);
-        expected = expected.mod(publicKey.getN());
-        Cipher cipher = new Cipher(a, publicKey);
-        cipher = cipher.mulPlainText(b);
-        assertEquals(expected, cipher.decrypt(privateKey));
     }
 
     @Test
@@ -153,41 +105,6 @@ public class CipherTest {
         BigInteger cipherValue = new BigInteger(cipherBytes);
         Cipher cipher2 = new Cipher(publicKey, cipherValue);
         assertEquals(cipher.decrypt(privateKey), cipher2.decrypt(privateKey));
-    }
-
-    @Test
-    public void testSerializableWithInterface() throws IOException, ClassNotFoundException {
-        BigInteger a = new BigInteger(NUMBER_BIT_LENGTH, rng);
-        Cipher cipher = new Cipher(a, publicKey);
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(cipher);
-
-        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        Cipher cipherReadFromDiskOrInternet = (Cipher) ois.readObject();
-        assertEquals(a, cipherReadFromDiskOrInternet.decrypt(privateKey));
-    }
-
-    @Test
-    public void testSubtractToNegative() {
-        BigInteger a = new BigInteger("2000");
-        BigInteger b = new BigInteger("3000");
-        BigInteger expected = a.subtract(b);
-        Cipher cipherA = new Cipher(a, publicKey);
-        Cipher cipherB = new Cipher(b, publicKey);
-
-        cipherB = cipherB.mulPlainText(new BigInteger("-1"));
-        try {
-            cipherA = cipherA.addCipherText(cipherB);
-        } catch (Exception e) {
-            fail();
-        }
-
-        BigInteger ans = cipherA.decrypt(privateKey);
-        ans = ans.subtract(publicKey.getN());
-        assertEquals(expected, ans);
     }
 
     @Test

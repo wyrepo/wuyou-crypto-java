@@ -16,7 +16,7 @@ public class PrivateKeyTest {
     private PublicKey publicKey;
     private Random rng;
     private int N_BIT_LENGTH = 1024;
-    private int NUMBER_BIT_LENGTH = N_BIT_LENGTH / 2;
+    private int NUMBER_BIT_LENGTH = 63; // must less than 64, Long.MAX_VALUE = 2^63-1
 
     @Before
     public void setUp() {
